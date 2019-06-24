@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
@@ -23,11 +24,11 @@ class FlightScreen extends StatelessWidget {
 				backgroundColor: Color(0xFF068FFA),
 				title: Text(title),
 			),
-			body: _Background(context),
+			body: FlightStream(context),
 		);
 	}
 	
-	Widget _Background(BuildContext context) {
+	Widget FlightStream(BuildContext context) {
 		final flightDetailsBloc = Provider.of<FlightDetailsBloc>(context);
 		
 		return StreamBuilder<Flight>(
@@ -50,6 +51,16 @@ class FlightScreen extends StatelessWidget {
 						child: Column(
 							children: <Widget>[
 								FlightDetailsCard( airportLookup: airportLookup, flightDetails: snapshot.data.details, flightDetailsBloc: flightDetailsBloc, ),
+								SizedBox(
+									width: double.infinity,
+									child: RaisedButton(
+										child: Text("SEARCH", style: TextStyle(color: Colors.white)),
+										color: Colors.brown,
+										onPressed: () {
+											print('from code : ' + snapshot.data.details.from_code + ' to code: ' + snapshot.data.details.to_code);
+										},
+									),
+								),
 								Expanded(child: Container()),
 							],
 						),
@@ -65,17 +76,23 @@ class VerticalSpacing extends SizedBox {
 }
 
 class AirportWidget extends StatelessWidget {
-	AirportWidget({this.iconData, this.title, this.airport, this.onPressed});
+	AirportWidget({ this.iconData, this.type, this.title, this.airport, this.onPressed, this.flightDetailsBloc });
 	
 	final IconData iconData;
-	final Widget title;
+	final String type;
+	final String title;
 	final Airport airport;
 	final VoidCallback onPressed;
+	final FlightDetailsBloc flightDetailsBloc;
 	
 	@override
 	Widget build(BuildContext context) {
-		final airportDisplayName = airport != null ? '${airport.airport_name} (${airport.airport_code})' : 'Select...';
-		// final airportDisplayName = airport != null ? '${airport.name} (${airport.iata})' : 'Select...';
+		final code = airport != null ? airport.airport_code : '';
+		final detail = airport != null ? '${airport.airport_name} (${airport.airport_code})' : title;
+		
+		if (type == 'from_code') flightDetailsBloc.updateWith(from_code: code);
+		else if (type == 'to_code') flightDetailsBloc.updateWith(to_code: code);
+		
 		return InkWell(
 			onTap: onPressed,
 			child: Padding(
@@ -90,10 +107,9 @@ class AirportWidget extends StatelessWidget {
 							child: Column(
 								crossAxisAlignment: CrossAxisAlignment.start,
 								children: <Widget>[
-									title,
 									VerticalSpacing(height: 4.0),
-									AutoSizeText( airportDisplayName, style: TextStyle(fontSize: 16.0), minFontSize: 13.0, maxLines: 2, overflow: TextOverflow.ellipsis, ),
-									Divider(height: 1.0, color: Colors.black87),
+									AutoSizeText( detail, style: TextStyle(fontSize: 16.0), minFontSize: 13.0, maxLines: 2, overflow: TextOverflow.ellipsis, ),
+									// Divider(height: 1.0, color: Colors.black87),
 								],
 							),
 						),
@@ -110,17 +126,6 @@ class FlightDetailsCard extends StatelessWidget {
 	final FlightDetails flightDetails;
 	final FlightDetailsBloc flightDetailsBloc;
 	final AirportLookup airportLookup;
-	
-	final Map<FlightClass, Widget> flightClassChildren = const <FlightClass, Widget>{
-		FlightClass.economy: Text('Economy'),
-		FlightClass.business: Text('Business'),
-		FlightClass.first: Text('First'),
-	};
-	
-	final Map<FlightType, Widget> flightTypeChildren = const <FlightType, Widget>{
-		FlightType.oneWay: Text('One Way'),
-		FlightType.twoWays: Text('Return'),
-	};
 	
 	Future<Airport> _showSearch(BuildContext context) async {
 		return await showSearch<Airport>(
@@ -160,9 +165,9 @@ class FlightDetailsCard extends StatelessWidget {
 					mainAxisSize: MainAxisSize.min,
 					children: <Widget>[
 						VerticalSpacing(),
-						AirportWidget( iconData: Icons.flight_takeoff, title: Text('departing from'), airport: flightDetails.departure, onPressed: () => _selectDeparture(context) ),
+						AirportWidget( iconData: Icons.flight_takeoff, type: 'from_code', title: '-- pilih keberangkatan --', airport: flightDetails.departure, onPressed: () => _selectDeparture(context), flightDetailsBloc: flightDetailsBloc ),
 						VerticalSpacing(),
-						AirportWidget( iconData: Icons.flight_land, title: Text('flying to'), airport: flightDetails.arrival, onPressed: () => _selectArrival(context) ),
+						AirportWidget( iconData: Icons.flight_land, type: 'to_code', title: '-- pilih tiba --', airport: flightDetails.arrival, onPressed: () => _selectArrival(context), flightDetailsBloc: flightDetailsBloc ),
 						VerticalSpacing(),
 					],
 				),
@@ -172,7 +177,8 @@ class FlightDetailsCard extends StatelessWidget {
 }
 
 class AirportSearchDelegate extends SearchDelegate<Airport> {
-	AirportSearchDelegate({@required this.airportLookup});
+	AirportSearchDelegate({ @required this.airportLookup });
+	
 	final AirportLookup airportLookup;
 	
 	@override
@@ -236,7 +242,7 @@ class AirportSearchPlaceholder extends StatelessWidget {
 }
 
 class AirportSearchResultTile extends StatelessWidget {
-	const AirportSearchResultTile({@required this.airport, @required this.searchDelegate});
+	const AirportSearchResultTile({ @required this.airport, @required this.searchDelegate });
 	
 	final Airport airport;
 	final SearchDelegate<Airport> searchDelegate;
@@ -244,9 +250,7 @@ class AirportSearchResultTile extends StatelessWidget {
 	@override
 	Widget build(BuildContext context) {
 		final title = '${airport.airport_name} (${airport.airport_code})';
-		// final title = '${airport.name} (${airport.iata})';
 		final subtitle = '${airport.airport_city}, ${airport.airport_country}';
-		// final subtitle = '${airport.city}, ${airport.country}';
 		final ThemeData theme = Theme.of(context);
 		return ListTile(
 			dense: true,

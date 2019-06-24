@@ -13,12 +13,12 @@ class FlightDetailsBloc {
 	
 	Stream<Flight> get flightStream => _flightSubject.controller.stream;
 	
-	void updateWith({ Airport departure, Airport arrival, FlightClass flightClass, FlightType flightType, }) {
+	void updateWith({ Airport departure, Airport arrival, from_code, to_code }) {
 		Flight newValue = _flightSubject.value.copyWith(
 			departure: departure,
 			arrival: arrival,
-			flightClass: flightClass,
-			flightType: flightType,
+			from_code: from_code,
+			to_code: to_code,
 		);
 		_flightSubject.add(newValue);
 	}
@@ -38,8 +38,8 @@ class Flight {
 		);
 	}
 	
-	Flight copyWith({ Airport departure, Airport arrival, FlightClass flightClass, FlightType flightType, }) {
-		FlightDetails flightDetails = details.copyWith( departure: departure, arrival: arrival, flightClass: flightClass, flightType: flightType, );
+	Flight copyWith({ Airport departure, Airport arrival, from_code, to_code }) {
+		FlightDetails flightDetails = details.copyWith( departure: departure, arrival: arrival, from_code: from_code, to_code: to_code );
 		return Flight(
 			details: flightDetails
 		);
@@ -49,24 +49,16 @@ class Flight {
 class FlightDetails {
 	final Airport departure;
 	final Airport arrival;
-	final FlightClass flightClass;
-	final FlightType flightType;
+	final String from_code;
+	final String to_code;
 	
-	FlightDetails({ this.departure, this.arrival, this.flightClass = FlightClass.economy, this.flightType = FlightType.oneWay });
-	FlightDetails copyWith({ Airport departure, Airport arrival, FlightClass flightClass, FlightType flightType }) {
+	FlightDetails({ this.departure, this.arrival, this.from_code, this.to_code });
+	FlightDetails copyWith({ Airport departure, Airport arrival, from_code, to_code }) {
 		return FlightDetails(
 			departure: departure ?? this.departure,
 			arrival: arrival ?? this.arrival,
-			flightClass: flightClass ?? this.flightClass,
-			flightType: flightType ?? this.flightType,
+			from_code: from_code ?? this.from_code,
+			to_code: to_code ?? this.to_code,
 		);
 	}
-}
-
-enum FlightType {
-	oneWay, twoWays
-}
-
-enum FlightClass {
-	economy, business, first
 }
