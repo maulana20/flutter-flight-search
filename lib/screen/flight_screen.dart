@@ -57,7 +57,7 @@ class FlightScreen extends StatelessWidget {
 										child: Text("SEARCH", style: TextStyle(color: Colors.white)),
 										color: Colors.brown,
 										onPressed: () {
-											print('from code : ' + snapshot.data.details.from_code + ' to code: ' + snapshot.data.details.to_code);
+											print('from code: ' + snapshot.data.details.from_code + ' to code: ' + snapshot.data.details.to_code + ' date: ' + snapshot.data.details.date + ' adult: ' + snapshot.data.details.adult.toString() + ' child: ' + snapshot.data.details.child.toString() + ' infant: ' + snapshot.data.details.infant.toString());
 										},
 									),
 								),
@@ -120,6 +120,134 @@ class AirportWidget extends StatelessWidget {
 	}
 }
 
+class DateWidget extends StatefulWidget {
+	DateWidget({ this.flightDetailsBloc });
+	
+	final FlightDetailsBloc flightDetailsBloc;
+	
+	@override
+	_DateWidgetState createState() => _DateWidgetState(flightDetailsBloc: flightDetailsBloc);
+}
+
+class _DateWidgetState extends State<DateWidget> {
+	_DateWidgetState({ this.flightDetailsBloc });
+	
+	final FlightDetailsBloc flightDetailsBloc;
+	final _date = TextEditingController();
+	
+	Future _select() async {
+		DateTime picked = await showDatePicker(
+			context: context,
+			initialDate: new DateTime.now(),
+			firstDate: new DateTime(2016),
+			lastDate: new DateTime(2030)
+		);
+		if(picked != null) {
+			setState(() {
+				var dd = DateFormat('yyyy-MM-dd').format(picked);
+				
+				_date.text = dd;
+				flightDetailsBloc.updateWith(date: dd);
+				print('Selected date: ' + dd);
+			});
+		}
+	}
+	
+	@override
+	Widget build(BuildContext context) {
+		return InkWell(
+			onTap: () { _select(); },
+			child: Padding(
+				padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+				child: Row(
+					mainAxisSize: MainAxisSize.max,
+					crossAxisAlignment: CrossAxisAlignment.center,
+					children: <Widget>[
+						Icon(Icons.calendar_today),
+						SizedBox(width: 16.0),
+						Expanded(
+							child: Column(
+								crossAxisAlignment: CrossAxisAlignment.start,
+								children: <Widget>[
+									VerticalSpacing(height: 4.0),
+									IgnorePointer(
+										child: TextFormField(
+											controller: _date,
+											decoration: new InputDecoration(hintText: 'yyyy-mm-dd'),
+											maxLength: 10,
+											enabled: false,
+										),
+									),
+								],
+							),
+						),
+					],
+				),
+			),
+		);
+	}
+}
+
+class PassengerWidget extends StatefulWidget {
+	PassengerWidget({ this.flightDetailsBloc });
+	
+	final FlightDetailsBloc flightDetailsBloc;
+	
+	@override
+	_PassengerWidgetState createState() => _PassengerWidgetState(flightDetailsBloc: flightDetailsBloc);
+}
+
+class _PassengerWidgetState extends State<PassengerWidget> {
+	_PassengerWidgetState({ this.flightDetailsBloc });
+	
+	final FlightDetailsBloc flightDetailsBloc;
+	
+	int _adult = 0;
+	int _child = 0;
+	int _infant = 0;
+	
+	@override
+	Widget build(BuildContext context) {
+		return Container(
+			child: Row(
+				mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+				children: <Widget>[
+					Column(
+						mainAxisSize: MainAxisSize.min,
+						mainAxisAlignment: MainAxisAlignment.center,
+						children: [
+							Text('Adult'),
+							IconButton(icon: new Icon(Icons.add), onPressed: () { setState(() { _adult < 9 ? _adult++ : Container(); flightDetailsBloc.updateWith(adult: _adult); }); }),
+							Text(_adult.toString()),
+							IconButton(icon: new Icon(Icons.remove), onPressed: () { setState(() { _adult > 0 ? _adult-- : Container(); flightDetailsBloc.updateWith(adult: _adult); }); }),
+						],
+					),
+					Column(
+						mainAxisSize: MainAxisSize.min,
+						mainAxisAlignment: MainAxisAlignment.center,
+						children: [
+							Text('Child'),
+							IconButton(icon: new Icon(Icons.add), onPressed: () { setState(() { _child < 9 ? _child++ : Container(); flightDetailsBloc.updateWith(child: _child); }); }),
+							Text(_child.toString()),
+							IconButton(icon: new Icon(Icons.remove), onPressed: () { setState(() { _child > 0 ? _child-- : Container(); flightDetailsBloc.updateWith(child: _child); }); }),
+						],
+					),
+					Column(
+						mainAxisSize: MainAxisSize.min,
+						mainAxisAlignment: MainAxisAlignment.center,
+						children: [
+							Text('Infant'),
+							IconButton(icon: new Icon(Icons.add), onPressed: () { setState(() { _infant < 9 ? _infant++ : Container(); flightDetailsBloc.updateWith(infant: _infant); }); }),
+							Text(_infant.toString()),
+							IconButton(icon: new Icon(Icons.remove), onPressed: () { setState(() { _infant > 0 ? _infant-- : Container(); }); flightDetailsBloc.updateWith(infant: _infant); }),
+						],
+					),
+				],
+			),
+		);
+	}
+}
+
 class FlightDetailsCard extends StatelessWidget {
 	FlightDetailsCard({ @required this.flightDetails, @required this.flightDetailsBloc, @required this.airportLookup, });
 	
@@ -168,6 +296,10 @@ class FlightDetailsCard extends StatelessWidget {
 						AirportWidget( iconData: Icons.flight_takeoff, type: 'from_code', title: '-- pilih keberangkatan --', airport: flightDetails.departure, onPressed: () => _selectDeparture(context), flightDetailsBloc: flightDetailsBloc ),
 						VerticalSpacing(),
 						AirportWidget( iconData: Icons.flight_land, type: 'to_code', title: '-- pilih tiba --', airport: flightDetails.arrival, onPressed: () => _selectArrival(context), flightDetailsBloc: flightDetailsBloc ),
+						// VerticalSpacing(),
+						DateWidget(flightDetailsBloc: flightDetailsBloc),
+						VerticalSpacing(),
+						PassengerWidget(flightDetailsBloc: flightDetailsBloc),
 						VerticalSpacing(),
 					],
 				),
@@ -202,7 +334,7 @@ class AirportSearchDelegate extends SearchDelegate<Airport> {
 	
 	Widget buildMatchingSuggestions(BuildContext context) {
 		if (query.isEmpty) return Container();
-		if (query.length < 3) return Container();
+		// if (query.length < 3) return Container();
 		
 		final searched = airportLookup.searchString(query);
 		
