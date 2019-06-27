@@ -6,7 +6,13 @@ A new Flutter project.
 
 Pencarian jadwal berdasarkan rute penerbangan.
 
-Bersumber tutorial pada https://github.com/bizz84/flight_co2_calculator_flutter
+Bersumber tutorial pada https://github.com/bizz84/flight_co2_calculator_flutter.
+
+Proses yang di jalankan :
+- Pencarian airport melalui widget dengan menggunakan search delegate
+- Pencarian tanggal dengan datepicker
+- Counter melalui widget dengan create state pada widget yand di tuju
+
 
 Langkah sebelum memulai :
 - ambil paket sesuai pub yang di butuhkan
@@ -27,3 +33,7 @@ jalankan perintah :
 ```bash
 flutter run
 ```
+
+Tampilan
+
+![demo](https://github.com/maulana20/flutter-flight-search/blob/master/demo.gif)
