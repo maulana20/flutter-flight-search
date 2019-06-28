@@ -9,13 +9,72 @@ import 'package:auto_size_text/auto_size_text.dart';
 
 import 'flight/blocs/flight_details_bloc.dart';
 import '../model/airport.dart';
+import '../model/schedule.dart';
 import '../api/airport_lookup.dart';
+import '../api/versatiket_api.dart';
 
-class FlightScreen extends StatelessWidget {
-	FlightScreen({this.airportLookup});
+class FlightScreen extends StatefulWidget {
+	FlightScreen({ this.airportLookup });
+	
+	final AirportLookup airportLookup;
+	
+	@override
+	_FlightScreenState createState() => _FlightScreenState(airportLookup: airportLookup);
+}
+
+class _FlightScreenState extends State<FlightScreen> {
+	_FlightScreenState({ this.airportLookup });
 	
 	final AirportLookup airportLookup;
 	final String title = 'Flutter Flight';
+	
+	VersatiketApi _versaApi;
+	List<Schedule> schedules;
+	
+	@override
+	void initState() {
+		super.initState();
+		_versaApi = VersatiketApi();
+	}
+	
+	Future<void> _alert(BuildContext context, String info) {
+		return showDialog<void>(
+			context: context,
+			builder: (BuildContext context) {
+				return AlertDialog(
+					title: Text('Warning !'),
+					content: Text(info),
+					actions: <Widget>[
+						FlatButton(
+							child: Text('Ok'),
+							onPressed: () {
+							  Navigator.of(context).pop();
+							},
+						),
+					],
+				);
+			},
+		);
+	}
+	
+	Future _process(FlightDetails details) async {
+		if (details.from_code.isEmpty) {
+			_alert(context, 'tidak ada pilih untuk keberangkatan');
+		} else if (details.to_code.isEmpty) {
+			_alert(context, 'tidak ada pilih untuk tiba');
+		} else if (details.date.isEmpty) {
+			_alert(context, 'tanggal harus di isi');
+		} else if (details.adult == 0 || details.adult == null) {
+			_alert(context, 'penumpang dewasa tidak boleh kosong');
+		} else {
+			await _versaApi.start();
+			schedules = await _versaApi.search(details);
+			
+			for (final data in schedules) {
+				print(data.flight);
+			}
+		}
+	}
 	
 	@override
 	Widget build(BuildContext context) {
@@ -56,9 +115,7 @@ class FlightScreen extends StatelessWidget {
 									child: RaisedButton(
 										child: Text("SEARCH", style: TextStyle(color: Colors.white)),
 										color: Colors.brown,
-										onPressed: () {
-											print('from code: ' + snapshot.data.details.from_code + ' to code: ' + snapshot.data.details.to_code + ' date: ' + snapshot.data.details.date + ' adult: ' + snapshot.data.details.adult.toString() + ' child: ' + snapshot.data.details.child.toString() + ' infant: ' + snapshot.data.details.infant.toString());
-										},
+										onPressed: () => _process(snapshot.data.details),
 									),
 								),
 								Expanded(child: Container()),

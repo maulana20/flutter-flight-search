@@ -12,6 +12,8 @@ Proses yang di jalankan :
 - Pencarian airport melalui widget dengan menggunakan search delegate
 - Pencarian tanggal dengan datepicker
 - Counter melalui widget dengan create state pada widget yand di tuju
+- Dialog popup jika tidak ada pengisian data
+- Pencarian jadwal melalui api dengan http set cookie
 
 
 Langkah sebelum memulai :
