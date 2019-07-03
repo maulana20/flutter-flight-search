@@ -14,6 +14,7 @@ Proses yang di jalankan :
 - Counter melalui widget dengan create state pada widget yand di tuju
 - Dialog popup jika tidak ada pengisian data
 - Pencarian jadwal melalui api dengan http set cookie
+- Tampil list jadwal pada route lain
 
 
 Langkah sebelum memulai :
