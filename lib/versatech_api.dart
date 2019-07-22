@@ -24,7 +24,7 @@ void main() async {
 	Session session = new Session();
 	
 	Future login() async {
-		final response = await session.post('https://atris.versatiket.co.id/api/admin', body: {'user': 'user', 'password': 'xxxx'});
+		final response = await session.post('https://atris.versatiket.co.id/api/admin', body: {'user': 'user', 'password': 'pass'});
 		
 		return response;
 	}
@@ -63,7 +63,7 @@ void main() async {
 	}
 	
 	Future<Schedule> iataLowFare() async {
-		final response = await session.post('https://atris.versatiket.co.id/api/bookinginternational/internationalh2hlowfare', body: {'adult': '1', 'child': '0', 'infant': '0', 'from_code': 'CGK', 'to_code': 'SIN', 'from_date': '2019-07-10', 'to_date': '2019-07-10', 'trip_type': 'oneway', 'airlinecode': ''});
+		final response = await session.post('https://atris.versatiket.co.id/api/bookinginternational/internationalh2hlowfare', body: {'adult': '1', 'child': '0', 'infant': '0', 'from_code': 'CGK', 'to_code': 'SIN', 'from_date': '2019-08-10', 'to_date': '2019-08-10', 'trip_type': 'oneway', 'airlinecode': ''});
 		
 		var schedule = response['content']['list'].map<Schedule>((json) => Schedule.fromJson(json)).toList();
 		
@@ -80,10 +80,10 @@ void main() async {
 	await profile();
 	print(_address.address_city);
 	
-	await airport();
+	/* await airport();
 	for (final data in _airports) {
 		print(data.airport_code);
-	}
+	} */
 	
 	await iataLowFare();
 	for (final data in _schedules) {

@@ -45,7 +45,11 @@ class VersatiketApi {
 	}
 	
 	Future<List<Schedule>> search(FlightDetails details) async {
-		final response = await session.post(url + '/api/bookinginternational/internationalh2hlowfare', body: {'adult': details.adult.toString(), 'child': details.child.toString(), 'infant': details.infant.toString(), 'from_code': details.from_code, 'to_code': details.to_code, 'from_date': '2019-07-10', 'to_date': details.date, 'trip_type': 'oneway', 'airlinecode': ''});
+		final response = await session.post(url + '/api/bookinginternational/internationalh2hlowfare', body: {'adult': details.adult.toString(), 'child': details.child.toString(), 'infant': details.infant.toString(), 'from_code': details.from_code, 'to_code': details.to_code, 'from_date': details.date, 'to_date': details.date, 'trip_type': 'oneway', 'airlinecode': ''});
 		return response['content']['list'].map<Schedule>((json) => Schedule.fromJson(json)).toList();
+	}
+	
+	Future searchPost(FlightDetails details) async {
+		return await session.post(url + '/api/bookinginternational/internationalh2hlowfare', body: {'adult': details.adult.toString(), 'child': details.child.toString(), 'infant': details.infant.toString(), 'from_code': details.from_code, 'to_code': details.to_code, 'from_date': details.date, 'to_date': details.date, 'trip_type': 'oneway', 'airlinecode': ''});
 	}
 }
