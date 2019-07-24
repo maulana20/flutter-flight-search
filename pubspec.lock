@@ -55,6 +55,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.0"
+  flutter_money_formatter:
+    dependency: "direct main"
+    description:
+      name: flutter_money_formatter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -80,7 +87,7 @@ packages:
       name: intl
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.15.7"
+    version: "0.15.8"
   matcher:
     dependency: transitive
     description:

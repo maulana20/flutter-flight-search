@@ -5,8 +5,9 @@ class Schedule extends Object {
 	String date_arrive;
 	String date_depart;
 	String str_time;
+	int total;
 	
-	Schedule({this.flight, this.flightvendor, this.route, this.date_arrive, this.date_depart, this.str_time});
+	Schedule({this.flight, this.flightvendor, this.route, this.date_arrive, this.date_depart, this.str_time, this.total});
 	
 	factory Schedule.fromJson(Map<String, dynamic> json) {
 		return Schedule(
@@ -16,6 +17,7 @@ class Schedule extends Object {
 			date_arrive: json['date_arrive'],
 			date_depart: json['date_depart'],
 			str_time: json['str_time'],
+			total: json['total'],
 		);
 	}
 }

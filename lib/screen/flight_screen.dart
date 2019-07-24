@@ -65,7 +65,7 @@ class _FlightScreenState extends State<FlightScreen> {
 			_alert(context, 'tidak ada pilih untuk keberangkatan');
 		} else if (details.to_code.isEmpty) {
 			_alert(context, 'tidak ada pilih untuk tiba');
-		} else if (details.date.isEmpty) {
+		} else if (details.date == null) {
 			_alert(context, 'tanggal harus di isi');
 		} else if (details.adult == 0 || details.adult == null) {
 			_alert(context, 'penumpang dewasa tidak boleh kosong');
