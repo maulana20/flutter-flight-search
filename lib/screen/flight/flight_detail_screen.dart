@@ -12,6 +12,8 @@ class FlightScheduleScreen extends StatelessWidget {
 	
 	@override
 	Widget build(BuildContext context) {
+		int count_pax = flightDetails.adult + (flightDetails.child != null ? flightDetails.child : 0);
+		
 		return MaterialApp(
 			title: 'Pilih Jadwal',
 			home: Scaffold(
@@ -25,7 +27,6 @@ class FlightScheduleScreen extends StatelessWidget {
 						// mainAxisAlignment: MainAxisAlignment.center,
 						children: [
 							Row(
-								// mainAxisAlignment: MainAxisAlignment.center,
 								children: [
 									Text(flightDetails.from_code, style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold)),
 									SizedBox(width: 5.0),
@@ -35,13 +36,12 @@ class FlightScheduleScreen extends StatelessWidget {
 								],
 							),
 							Row(
-								// mainAxisAlignment: MainAxisAlignment.center,
 								children: [
 									Text(flightDetails.date, style: TextStyle(fontSize: 12.0)),
 									SizedBox(width: 5.0),
 									Icon(Icons.grade, size: 8.0),
 									SizedBox(width: 5.0),
-									Text(flightDetails.adult.toString() + ' pax', style: TextStyle(fontSize: 12.0)),
+									Text('${count_pax} pax', style: TextStyle(fontSize: 12.0)),
 								],
 							),
 						]
@@ -68,38 +68,43 @@ class FlightScheduleTile extends StatelessWidget {
 		MoneyFormatterOutput total = FlutterMoneyFormatter(amount: schedule.total.toDouble()).output;
 		
 		return Card(
-			child: ListTile(
-				title: 
-				Row(
-					mainAxisAlignment: MainAxisAlignment.spaceBetween,
-					children: [
-						Column(
-							mainAxisSize: MainAxisSize.min,
-							children: [
-								_flight(schedule.flightvendor.split('##')[0], schedule.flight.split('##')[0]),
-								SizedBox(height: 4.0),
-								_time(schedule.str_time.split('##')[0].split(' ').join(' - ')),
-								SizedBox(height: 10.0),
-								if (schedule.flightvendor.split('##').length > 1) _flight(schedule.flightvendor.split('##')[1], schedule.flight.split('##')[1]),
-								if (schedule.flightvendor.split('##').length > 1) SizedBox(height: 4.0),
-								if (schedule.str_time.split('##').length > 1) _time(schedule.str_time.split('##')[1].split(' ').join(' - ')),
-								if (schedule.str_time.split('##').length > 1) SizedBox(height: 10.0),
-							],
-						),
-						Row( children: [Text(total.withoutFractionDigits, style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)), ], ),
-					],
+			child: Padding(
+				padding: EdgeInsets.all(8.0),
+				child: ListTile(
+					title: Row(
+						mainAxisAlignment: MainAxisAlignment.spaceBetween,
+						children: [
+							Column(
+								mainAxisSize: MainAxisSize.min,
+								children: [
+									_flight(schedule.flightvendor.split('##')[0], schedule.flight.split('##')[0]),
+									SizedBox(height: 4.0),
+									_schedule(schedule.route.split('##')[0], schedule.str_time.split('##')[0]),
+									SizedBox(height: 10.0),
+									if (schedule.flightvendor.split('##').length > 1) _flight(schedule.flightvendor.split('##')[1], schedule.flight.split('##')[1]),
+									if (schedule.flightvendor.split('##').length > 1) SizedBox(height: 4.0),
+									if (schedule.flightvendor.split('##').length > 1) _schedule(schedule.route.split('##')[1], schedule.str_time.split('##')[1]),
+									if (schedule.flightvendor.split('##').length > 1) SizedBox(height: 10.0),
+								],
+							),
+							Row( children: [Text(total.withoutFractionDigits, style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)), ], ),
+						],
+					),
+					onTap: () => print(schedule.flightvendor),
 				),
-				// title: Text('${schedule.flight} ${schedule.flightvendor} ${schedule.route} ${schedule.date_arrive} ${schedule.date_depart} ${schedule.str_time}'),
-				// onTap: () => Navigator.pop(context),
 			),
 		);
 	}
 	
 	Row _flight(String vendor, String flight) {
-		return Row( children: [ Text(vendor, style: TextStyle(fontSize: 14.0)), SizedBox(width: 5.0), Icon(Icons.flight, size: 12.0), SizedBox(width: 5.0), Text(flight, style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)), ], );
+		return Row( children: [ Text(vendor, style: TextStyle(fontSize: 12.0)), SizedBox(width: 5.0), Icon(Icons.flight, size: 12.0), SizedBox(width: 5.0), Text(flight, style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold)), ], );
 	}
 	
-	Row _time(String time) {
-		return Row( children: [ Icon(Icons.calendar_today, size: 12.0), SizedBox(width: 5.0), Text(time, style: TextStyle(fontSize: 10.0)), ], );
+	Row _schedule(String route, String time) {
+		return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children:[Icon(Icons.calendar_today, size: 12.0), SizedBox(width: 5.0), _detail(route.split('-')[0], time.split(' ')[0]), SizedBox(width: 12.0), _detail(route.split('-')[1], time.split(' ')[1])]);
+	}
+	
+	Row _detail(String city, String hour) {
+		return Row(children: [Text(city, style: TextStyle(fontSize: 12.0)), SizedBox(width: 3.0), Text(hour, style: TextStyle(fontSize: 10.0))]);
 	}
 }
