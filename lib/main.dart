@@ -11,6 +11,8 @@ import 'api/airport_lookup.dart';
 import 'screen/flight/blocs/flight_details_bloc.dart';
 
 void main() async {
+	WidgetsFlutterBinding.ensureInitialized();
+	
 	final start = DateTime.now();
 	
 	List<Airport> airports = await AirportDataReader.load('assets/data/airport_world_wide.json');
